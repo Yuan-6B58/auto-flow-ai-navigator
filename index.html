@@ -1,0 +1,384 @@
+ <!DOCTYPE html>
+ <html lang="zh-CN">
+ <head>
+ <meta charset="UTF-8">
+ <meta name="viewport" content="width=device-width, initial-scale=1.0">
+ <title>自动流AI导航 — Auto-Flow AI Navigator</title>
+ <link rel="preconnect" href="https://fonts.googleapis.com">
+ <link href="https://fonts.googleapis.com/css2?family=Inter:opsz@14..32&display=swap" rel="stylesheet">
+ <style>
+ *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+ body{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f8f9fc;color:#1a1a2e;line-height:1.6}
+ a{text-decoration:none}
+ 
+ /* Header */
+ .header{position:fixed;top:0;left:0;width:100%;z-index:100;background:rgba(255,255,255,0.85);backdrop-filter:blur(12px);border-bottom:1px solid rgba(0,0,0,0.06)}
+ .header-inner{max-width:1280px;margin:0 auto;padding:0 24px;height:60px;display:flex;align-items:center;justify-content:space-between}
+ .logo{font-weight:700;font-size:18px;letter-spacing:-0.3px;display:flex;align-items:center;gap:8px}
+ .logo svg{width:24px;height:24px}
+ .nav{display:flex;gap:20px;font-size:14px}
+ .nav a{color:#5a5a7a;transition:color .2s}
+ .nav a:hover{color:#4361ee}
+ 
+ /* Hero */
+ .hero{position:relative;margin-top:60px;padding:80px 24px 70px;overflow:hidden;background:linear-gradient(135deg,#0f0c29 0%,#302b63 50%,#24243e 100%)}
+ .hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 80% 60% at 20% 40%,rgba(67,97,238,0.2) 0%,transparent 70%),radial-gradient(ellipse 60% 50% at 80% 60%,rgba(76,201,240,0.12) 0%,transparent 70%);pointer-events:none}
+ .hero-content{position:relative;max-width:1280px;margin:0 auto;display:flex;flex-direction:column;align-items:center;text-align:center}
+ .hero h1{font-size:44px;font-weight:750;letter-spacing:-1px;color:#fff;margin-bottom:12px;line-height:1.15}
+ .hero h1 span{background:linear-gradient(135deg,#4cc9f0,#4361ee);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+ .hero p{font-size:17px;color:rgba(255,255,255,0.65);max-width:600px;margin-bottom:36px}
+ 
+ /* Featured Pills */
+ .featured-pills{display:flex;flex-wrap:wrap;gap:10px;justify-content:center}
+ .pill{display:inline-flex;align-items:center;gap:6px;padding:8px 18px;border-radius:999px;font-size:13px;font-weight:500;transition:all .2s;cursor:default}
+ .pill-n8n{background:rgba(232,89,62,0.15);color:#e8593e}
+ .pill-dify{background:rgba(67,97,238,0.15);color:#4361ee}
+ .pill-coze{background:rgba(0,184,169,0.15);color:#00b8a9}
+ .pill-comfy{background:rgba(114,9,183,0.15);color:#7209b7}
+ .pill-make{background:rgba(251,133,0,0.15);color:#fb8500}
+ .pill:hover{transform:translateY(-2px);filter:brightness(1.15)}
+ .pill .badge{background:rgba(255,255,255,0.15);padding:0 7px;border-radius:999px;font-size:11px;margin-left:2px;font-weight:600}
+ 
+ /* Stats */
+ .stats-row{display:flex;gap:40px;margin-top:40px;justify-content:center;flex-wrap:wrap}
+ .stat-item{text-align:center}
+ .stat-num{font-size:28px;font-weight:700;color:#fff;letter-spacing:-0.5px}
+ .stat-label{font-size:13px;color:rgba(255,255,255,0.5);margin-top:2px}
+ 
+ /* Main Layout */
+ .main{max-width:1280px;margin:0 auto;padding:0 24px}
+ 
+ /* Section */
+ .section{margin:56px 0}
+ .section-header{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:24px}
+ .section-title{font-size:22px;font-weight:650;letter-spacing:-0.3px}
+ .section-count{font-size:13px;color:#888;font-weight:450}
+ .section-desc{font-size:14px;color:#666;margin-top:4px;margin-bottom:20px}
+ 
+ /* Featured Grid */
+ .featured-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:16px}
+ .featured-card{background:#fff;border:1px solid #eee;border-radius:8px;padding:20px;transition:all .2s;position:relative;cursor:default}
+ .featured-card:hover{box-shadow:0 4px 20px rgba(0,0,0,0.06);border-color:#e0e0e0;transform:translateY(-2px)}
+ .featured-card .rank{font-size:13px;font-weight:600;padding:2px 10px;border-radius:999px;display:inline-block;margin-bottom:10px}
+ .rank-1{background:#fff3e0;color:#e65100}
+ .rank-2{background:#e3f2fd;color:#1565c0}
+ .rank-3{background:#e8f5e9;color:#2e7d32}
+ .rank-4{background:#fce4ec;color:#c62828}
+ .rank-5{background:#f3e5f5;color:#6a1b9a}
+ .featured-card h3{font-size:17px;font-weight:650;margin-bottom:4px}
+ .featured-card p{font-size:13px;color:#666;line-height:1.5;margin-bottom:10px}
+ .featured-card .meta{font-size:12px;color:#888;display:flex;flex-wrap:wrap;gap:6px}
+ .featured-card .meta span{display:inline-flex;align-items:center;gap:3px}
+ .featured-card .stars{color:#f5a623;font-size:14px}
+ 
+ /* Category Grid */
+ .category-block{margin-bottom:36px}
+ .cat-header{display:flex;align-items:center;gap:8px;margin-bottom:14px;padding-bottom:8px;border-bottom:1px solid #eee}
+ .cat-header .icon{width:30px;height:30px;display:flex;align-items:center;justify-content:center;border-radius:6px;font-size:16px}
+ .cat-header h2{font-size:17px;font-weight:600}
+ .cat-header .count{font-size:13px;color:#888;font-weight:450}
+ 
+ .cat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px}
+ .cat-card{border-radius:8px;padding:16px;transition:all .2s;cursor:default;border:1px solid transparent}
+ .cat-card:hover{transform:translateY(-2px)}
+ .cat-warm{background:linear-gradient(135deg,#fff8f0 0%,#ffebd6 100%)}
+ .cat-cool{background:linear-gradient(135deg,#f0f4ff 0%,#dce6ff 100%)}
+ .cat-purple{background:linear-gradient(135deg,#f5f0ff 0%,#e8daff 100%)}
+ .cat-green{background:linear-gradient(135deg,#f0fff4 0%,#d6ffe6 100%)}
+ .cat-card .top{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
+ .cat-card h3{font-size:15px;font-weight:600}
+ .cat-card .tag{font-size:11px;padding:1px 8px;border-radius:999px;font-weight:500}
+ .tag-open{background:rgba(46,125,50,0.12);color:#2e7d32}
+ .tag-closed{background:rgba(230,81,0,0.12);color:#e65100}
+ .tag-cloud{background:rgba(21,101,192,0.12);color:#1565c0}
+ .tag-hybrid{background:rgba(106,27,154,0.12);color:#6a1b9a}
+ .cat-card .desc{font-size:13px;color:#555;line-height:1.5;margin-bottom:8px}
+ .cat-card .focus{font-size:12px;color:#777;margin-bottom:6px;display:flex;flex-wrap:wrap;gap:4px}
+ .cat-card .focus .key{background:rgba(67,97,238,0.1);padding:1px 7px;border-radius:4px;color:#4361ee}
+ .cat-card .eval{font-size:12px;color:#888;display:flex;align-items:center;gap:4px;flex-wrap:wrap}
+ .cat-card .stars{color:#f5a623;font-size:13px}
+ 
+ /* Footer */
+ .footer{border-top:1px solid #eee;padding:32px 24px;text-align:center;font-size:13px;color:#888;margin-top:40px}
+ .footer a{color:#4361ee}
+ 
+ /* Responsive */
+ @media(max-width:768px){
+   .hero h1{font-size:30px}
+   .hero{padding:56px 20px 50px}
+   .featured-grid{grid-template-columns:1fr 1fr}
+   .cat-grid{grid-template-columns:1fr}
+   .stats-row{gap:24px}
+   .stat-num{font-size:22px}
+ }
+ @media(max-width:480px){
+   .featured-grid{grid-template-columns:1fr}
+   .nav{display:none}
+   .hero h1{font-size:26px}
+ }
+ </style>
+ </head>
+ <body>
+ 
+ <header class="header">
+   <div class="header-inner">
+     <div class="logo">
+       <svg viewBox="0 0 24 24" fill="none" stroke="#4361ee" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="5" r="2"/><circle cx="5" cy="19" r="2"/><circle cx="19" cy="19" r="2"/><line x1="12" y1="7" x2="12" y2="12"/><line x1="5" y1="17" x2="12" y2="12"/><line x1="19" y1="17" x2="12" y2="12"/></svg>
+       自动流AI导航
+     </div>
+     <nav class="nav">
+       <a href="#hot">热门推荐</a>
+       <a href="#workflow">工作流平台</a>
+       <a href="#app">AI应用平台</a>
+       <a href="#agent">Agent框架</a>
+       <a href="#model">模型工作流</a>
+     </nav>
+   </div>
+ </header>
+ 
+ <section class="hero">
+   <div class="hero-content">
+     <h1>AI <span>自动流</span> 工具导航</h1>
+     <p>精选全球最热门的 AI 自动化工作流工具，分类对比核心能力与市场口碑，帮你快速找到最适合的自动流方案。</p>
+     <div class="featured-pills">
+       <span class="pill pill-n8n"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg> n8n <span class="badge">#1</span></span>
+       <span class="pill pill-dify"> Dify <span class="badge">#2</span></span>
+       <span class="pill pill-coze"> Coze <span class="badge">#3</span></span>
+       <span class="pill pill-comfy"> ComfyUI <span class="badge">#4</span></span>
+       <span class="pill pill-make"> Make <span class="badge">#5</span></span>
+     </div>
+     <div class="stats-row">
+       <div class="stat-item"><div class="stat-num">18</div><div class="stat-label">收录工具</div></div>
+       <div class="stat-item"><div class="stat-num">4</div><div class="stat-label">核心分类</div></div>
+       <div class="stat-item"><div class="stat-num">实时</div><div class="stat-label">市场评价</div></div>
+     </div>
+   </div>
+ </section>
+ 
+ <div class="main">
+ 
+ <!-- Featured -->
+ <section class="section" id="hot">
+   <div class="section-header">
+     <div>
+       <div class="section-title">最热门自动流 AI</div>
+       <div class="section-desc">社区活跃度最高、用户评价最好的 5 款工具</div>
+     </div>
+     <div class="section-count">TOP 5</div>
+   </div>
+   <div class="featured-grid">
+     <div class="featured-card">
+       <span class="rank rank-1">#1 最热门</span>
+       <h3>n8n</h3>
+       <p>开源自动化工作流引擎，支持 400+ 集成节点，自托管部署，灵活度极高。</p>
+       <div class="meta">
+         <span><span class="stars">★★★★★</span> 4.9</span>
+         <span>⚡ 44k+ GitHub ⭐</span>
+       </div>
+     </div>
+     <div class="featured-card">
+       <span class="rank rank-2">#2 最热门</span>
+       <h3>Dify</h3>
+       <p>开源 LLMOps 平台，一站式构建 RAG、Agent、工作流应用，国产标杆产品。</p>
+       <div class="meta">
+         <span><span class="stars">★★★★★</span> 4.8</span>
+         <span>⚡ 52k+ GitHub ⭐</span>
+       </div>
+     </div>
+     <div class="featured-card">
+       <span class="rank rank-3">#3 最热门</span>
+       <h3>Coze（扣子）</h3>
+       <p>字节跳动出品的 AI Bot 构建平台，丰富的插件生态和知识库能力，上手极快。</p>
+       <div class="meta">
+         <span><span class="stars">★★★★★</span> 4.7</span>
+         <span>🔗 百万级用户</span>
+       </div>
+     </div>
+     <div class="featured-card">
+       <span class="rank rank-4">#4 最热门</span>
+       <h3>ComfyUI</h3>
+       <p>节点式 Stable Diffusion 工作流引擎，图像生成领域的标配工具，灵活性之王。</p>
+       <div class="meta">
+         <span><span class="stars">★★★★★</span> 4.8</span>
+         <span>⚡ 55k+ GitHub ⭐</span>
+       </div>
+     </div>
+     <div class="featured-card">
+       <span class="rank rank-5">#5 最热门</span>
+       <h3>Make</h3>
+       <p>可视化自动化平台（原 Integromat），直观的拖拽编辑器，适合企业级自动化场景。</p>
+       <div class="meta">
+         <span><span class="stars">★★★★☆</span> 4.4</span>
+         <span>🔗 企业级用户</span>
+       </div>
+     </div>
+   </div>
+ </section>
+ 
+ <!-- 一、自动化工作流平台 -->
+ <section class="section" id="workflow">
+   <div class="category-block">
+     <div class="cat-header">
+       <div class="icon" style="background:#fff3e0;color:#e65100">⚙</div>
+       <h2>自动化工作流平台</h2>
+       <span class="count">5 款工具</span>
+     </div>
+     <div class="cat-grid"><div class="cat-card cat-warm">
+         <div class="top"><h3>n8n</h3><span class="tag tag-open">开源</span></div>
+         <div class="desc">节点式自动化工作流引擎，支持自托管。400+ 内置节点，覆盖 HTTP、数据库、AI、消息通知等场景。</div>
+         <div class="focus"><span class="key">通用自动化</span><span class="key">自托管</span><span class="key">400+集成</span></div>
+         <div class="eval"><span class="stars">★★★★★</span> 4.9 — 开源社区活跃，企业自托管首选</div>
+       </div>
+       <div class="cat-card cat-warm">
+         <div class="top"><h3>Make</h3><span class="tag tag-cloud">SaaS</span></div>
+         <div class="desc">原 Integromat，可视化拖拽式自动化编辑器。支持数万种集成场景，企业级可靠性。</div>
+         <div class="focus"><span class="key">无代码</span><span class="key">可视化</span><span class="key">企业级</span></div>
+         <div class="eval"><span class="stars">★★★★☆</span> 4.4 — 比 Zapier 灵活，性价比高</div>
+       </div>
+       <div class="cat-card cat-warm">
+         <div class="top"><h3>Zapier</h3><span class="tag tag-cloud">SaaS</span></div>
+         <div class="desc">全球最成熟的自动化平台，集成数超 6000+，无需编程即可串联应用。</div>
+         <div class="focus"><span class="key">极简操作</span><span class="key">无代码</span><span class="key">6000+集成</span></div>
+         <div class="eval"><span class="stars">★★★★☆</span> 4.3 — 生态最大，但高阶功能付费较贵</div>
+       </div>
+       <div class="cat-card cat-warm">
+         <div class="top"><h3>Activepieces</h3><span class="tag tag-open">开源</span></div>
+         <div class="desc">开源版的 Zapier 替代，支持自托管，TypeScript 技术栈，易于二次开发。</div>
+         <div class="focus"><span class="key">开源替代</span><span class="key">TypeScript</span><span class="key">自托管</span></div>
+         <div class="eval"><span class="stars">★★★★☆</span> 4.2 — 新兴开源方案，社区快速增长</div>
+       </div>
+       <div class="cat-card cat-warm">
+         <div class="top"><h3>Node-RED</h3><span class="tag tag-open">开源</span></div>
+         <div class="desc">IBM 出品的流程编程工具，基于 Node.js，适合 IoT 和后端工作流编排。</div>
+         <div class="focus"><span class="key">IoT</span><span class="key">可视化编程</span><span class="key">Node.js</span></div>
+         <div class="eval"><span class="stars">★★★★☆</span> 4.1 — IoT 领域标准，但 AI 集成需要自行扩展</div>
+       </div>
+     </div>
+   </div>
+ </section>
+ 
+ <!-- 二、AI 应用开发平台 -->
+ <section class="section" id="app">
+   <div class="category-block">
+     <div class="cat-header">
+       <div class="icon" style="background:#e3f2fd;color:#1565c0">🤖</div>
+       <h2>AI 应用开发平台</h2>
+       <span class="count">4 款工具</span>
+     </div>
+     <div class="cat-grid">
+       <div class="cat-card cat-cool">
+         <div class="top"><h3>Dify</h3><span class="tag tag-open">开源</span></div>
+         <div class="desc">一站式 LLMOps 平台，集成 RAG、Agent、工作流、模型管理，支持私有化部署。国产开源标杆。</div>
+         <div class="focus"><span class="key">LLMOps</span><span class="key">RAG</span><span class="key">Agent</span><span class="key">私有化</span></div>
+         <div class="eval"><span class="stars">★★★★★</span> 4.8 — GitHub 52k+ ⭐，企业级 RAG 首选</div>
+       </div>
+       <div class="cat-card cat-cool">
+         <div class="top"><h3>Coze（扣子）</h3><span class="tag tag-cloud">云平台</span></div>
+         <div class="desc">字节跳动出品的 AI Bot 构建平台。内置插件市场、知识库、工作流编排，支持发布到飞书、微信等渠道。</div>
+         <div class="focus"><span class="key">Bot构建</span><span class="key">插件生态</span><span class="key">多渠道</span></div>
+         <div class="eval"><span class="stars">★★★★★</span> 4.7 — 国内 Bot 开发首选，上手极快</div>
+       </div>
+       <div class="cat-card cat-cool">
+         <div class="top"><h3>Flowise</h3><span class="tag tag-open">开源</span></div>
+         <div class="desc">低代码 LLM 应用构建工具，拖拽式搭建 RAG 对话应用，Node.js 技术栈。</div>
+         <div class="focus"><span class="key">低代码</span><span class="key">RAG</span><span class="key">拖拽搭建</span></div>
+         <div class="eval"><span class="stars">★★★★☆</span> 4.3 — 入门门槛低，适合快速原型验证</div>
+       </div>
+       <div class="cat-card cat-cool">
+         <div class="top"><h3>FastGPT</h3><span class="tag tag-open">开源</span></div>
+         <div class="desc">专注于知识库问答的 LLM 应用平台，支持向量检索与工作流编排，国产自研。</div>
+         <div class="focus"><span class="key">知识库</span><span class="key">问答</span><span class="key">工作流</span></div>
+         <div class="eval"><span class="stars">★★★★☆</span> 4.2 — 知识库场景体验优秀，商业友好</div>
+       </div>
+     </div>
+   </div>
+ </section>
+ 
+ <!-- 三、AI Agent 框架 -->
+ <section class="section" id="agent">
+   <div class="category-block">
+     <div class="cat-header">
+       <div class="icon" style="background:#f3e5f5;color:#6a1b9a">🧠</div>
+       <h2>AI Agent 框架</h2>
+       <span class="count">5 款工具</span>
+     </div>
+     <div class="cat-grid">
+       <div class="cat-card cat-purple">
+         <div class="top"><h3>AutoGPT</h3><span class="tag tag-open">开源</span></div>
+         <div class="desc">自主 AI Agent 的先驱项目，基于 GPT-4 自动分解任务、执行并迭代，能独立完成复杂目标。</div>
+         <div class="focus"><span class="key">自主Agent</span><span class="key">任务分解</span><span class="key">长期记忆</span></div>
+         <div class="eval"><span class="stars">★★★★☆</span> 4.3 — 开创性项目，但实测稳定性有待提升</div>
+       </div>
+       <div class="cat-card cat-purple">
+         <div class="top"><h3>CrewAI</h3><span class="tag tag-open">开源</span></div>
+         <div class="desc">多 Agent 协作框架，定义不同角色的 Agent 组成"团队"协同完成复杂工作流任务。</div>
+         <div class="focus"><span class="key">多Agent</span><span class="key">角色协作</span><span class="key">任务编排</span></div>
+         <div class="eval"><span class="stars">★★★★★</span> 4.6 — 多 Agent 场景的 Python 首选框架</div>
+       </div>
+       <div class="cat-card cat-purple">
+         <div class="top"><h3>LangGraph</h3><span class="tag tag-open">开源</span></div>
+         <div class="desc">LangChain 出品的有状态 Agent 编排框架，支持图结构的工作流、循环与条件分支。</div>
+         <div class="focus"><span class="key">有状态</span><span class="key">图编排</span><span class="key">LangChain生态</span></div>
+         <div class="eval"><span class="stars">★★★★★</span> 4.7 — 与 LangChain 深度集成，社区活跃</div>
+       </div>
+       <div class="cat-card cat-purple">
+         <div class="top"><h3>MetaGPT</h3><span class="tag tag-open">开源</span></div>
+         <div class="desc">多角色协作框架，模拟产品经理、架构师、工程师等角色协作完成软件开发。</div>
+         <div class="focus"><span class="key">软件开发</span><span class="key">多角色</span><span class="key">模拟协作</span></div>
+         <div class="eval"><span class="stars">★★★★☆</span> 4.2 — 角色模拟思路出色，实际产出取决于模型能力</div>
+       </div>
+       <div class="cat-card cat-purple">
+         <div class="top"><h3>Dify Agent</h3><span class="tag tag-hybrid">混合</span></div>
+         <div class="desc">Dify 内置的 Agent 能力，支持 ReAct 和 Function Calling 模式，与 RAG、工作流无缝衔接。</div>
+         <div class="focus"><span class="key">ReAct</span><span class="key">FunctionCall</span><span class="key">Dify生态</span></div>
+         <div class="eval"><span class="stars">★★★★☆</span> 4.5 — 与 Dify RAG 工作流配合效果极佳</div>
+       </div>
+     </div>
+   </div>
+ </section>
+ 
+ <!-- 四、AI 模型工作流 -->
+ <section class="section" id="model">
+   <div class="category-block">
+     <div class="cat-header">
+       <div class="icon" style="background:#e8f5e9;color:#2e7d32">🔀</div>
+       <h2>AI 模型工作流</h2>
+       <span class="count">4 款工具</span>
+     </div>
+     <div class="cat-grid">
+       <div class="cat-card cat-green">
+         <div class="top"><h3>ComfyUI</h3><span class="tag tag-open">开源</span></div>
+         <div class="desc">节点式 Stable Diffusion 工作流引擎，可精确控制图像生成的每一环节。</div>
+         <div class="focus"><span class="key">图像生成</span><span class="key">节点式</span><span class="key">SD生态</span></div>
+         <div class="eval"><span class="stars">★★★★★</span> 4.8 — 图像生成领域不可替代的标杆工具</div>
+       </div>
+       <div class="cat-card cat-green">
+         <div class="top"><h3>LangFlow</h3><span class="tag tag-open">开源</span></div>
+         <div class="desc">LangChain 的可视化伴侣工具，拖拽式构建 LLM 工作流，支持导出为 Python 代码。</div>
+         <div class="focus"><span class="key">LangChain可视化</span><span class="key">拖拽</span><span class="key">代码导出</span></div>
+         <div class="eval"><span class="stars">★★★★☆</span> 4.1 — 适合 LangChain 初学者理解工作流</div>
+       </div>
+       <div class="cat-card cat-green">
+         <div class="top"><h3>PromptFlow</h3><span class="tag tag-open">开源</span></div>
+         <div class="desc">微软出品的大模型工作流工具，集成 Azure AI，支持评估、调试与部署。</div>
+         <div class="focus"><span class="key">Azure集成</span><span class="key">评估</span><span class="key">企业级</span></div>
+         <div class="eval"><span class="stars">★★★★☆</span> 4.3 — 微软生态首选，企业级 LLM 开发</div>
+       </div>
+       <div class="cat-card cat-green">
+         <div class="top"><h3>Airflow (AI扩展)</h3><span class="tag tag-open">开源</span></div>
+         <div class="desc">Apache Airflow 配合 AI 算子，DAG 编排支持 ML 训练、模型推理和 MLOps 流程。</div>
+         <div class="focus"><span class="key">MLOps</span><span class="key">DAG编排</span><span class="key">调度</span></div>
+         <div class="eval"><span class="stars">★★★★☆</span> 4.0 — 传统数据编排扩展，适合 ML 基础设施</div>
+       </div>
+     </div>
+   </div>
+ </section>
+ 
+ </div>
+ 
+ <footer class="footer">
+   <p>自动流AI导航 · 持续更新中 · 数据截至 2026-06-13</p>
+ </footer>
+ 
+ </body>
+ </html>
